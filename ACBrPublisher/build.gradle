@@ -1,0 +1,37 @@
+plugins {
+    id 'maven-publish'
+}
+
+group = 'br.com.acbr'
+version = '1.0.0' // Lembre-se de incrementar isso a cada release
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'acbrlibcomum'
+            
+            // Aponta para o JAR que você gerou no outro projeto e copiou para cá
+            artifact('ACBrLibComum.jar') 
+            
+            // Opcional: Adicionar POM info para ficar bonito no GitHub
+            pom {
+                name = 'ACBrLibComum'
+                description = 'Biblioteca comum para bibliotecas ACBr Android'
+                url = 'https://github.com/BortoletoEric/ACBrLibComumAndroid'
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            // ATENÇÃO: Substitua USER e REPO pelos seus dados reais
+            url = uri("https://maven.pkg.github.com/BortoletoEric/ACBrLibComumAndroid")
+            
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}

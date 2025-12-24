@@ -1,0 +1,19 @@
+# --- Genérico (Vale para TODAS as pastas recursivamente) ---
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# --- Segurança (CRÍTICO) ---
+# Ignora local.properties onde quer que ele esteja
+local.properties
+
+# --- IDEs ---
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# --- Arquivos Gerados ---
+*.aar
+*.apk
