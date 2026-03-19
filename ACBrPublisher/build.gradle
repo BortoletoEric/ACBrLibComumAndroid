@@ -25,7 +25,6 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            // ATENÇÃO: Substitua USER e REPO pelos seus dados reais
             url = uri("https://maven.pkg.github.com/BortoletoEric/ACBrLibComumAndroid")
             
             credentials {

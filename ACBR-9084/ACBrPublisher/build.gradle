@@ -1,0 +1,88 @@
+plugins {
+    id 'java' // Necessário para usar withJavadocJar e withSourcesJar nativos
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'io.github.bortoletoeric'
+version = '1.0.0-MVP'
+
+// 1. GERAÇÃO DOS ARTEFATOS OBRIGATÓRIOS (Source e Javadoc)
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+// 2. CONFIGURAÇÃO DE PUBLICAÇÃO E POM
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'acbrlibcomum'
+            
+            // O artefato principal (seu jar do ACBr)
+            artifact file('ACBrLibComum.jar') 
+            // Os artefatos secundários obrigatórios
+            artifact javadocJar
+            artifact sourcesJar
+
+            // EXIGÊNCIA RÍGIDA: O POM METADATA
+            pom {
+                name = 'ACBrLibComum'
+                description = 'Biblioteca comum para o projeto ACBr no Android'
+                url = 'https://github.com/bortoletoeric/ACBrLibComum'
+                
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License, version 3.0'
+                        url = 'https://www.gnu.org/licenses/lgpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'bortoletoeric'
+                        name = 'Eric Bortoleto'
+                        email = 'ericbortoleto_9@outlook.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/bortoletoeric/ACBrLibComum.git'
+                    developerConnection = 'scm:git:ssh://github.com/bortoletoeric/ACBrLibComum.git'
+                    url = 'https://github.com/bortoletoeric/ACBrLibComum'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'BundleDir'
+            url = layout.buildDirectory.dir('bundle-staging')
+        }
+    }
+}
+
+// 3. ASSINATURA OBRIGATÓRIA DOS ARTEFATOS
+signing {
+    // 1. Lê a string do arquivo original intacto
+    def secretKeyText = file("minha_chave.asc").text
+    
+    // 2. Passa para o Gradle
+    useInMemoryPgpKeys(
+        project.property("signing.keyId"), 
+        secretKeyText, 
+        project.property("signing.password")
+    )
+    
+    sign publishing.publications.mavenJava
+}
+
+tasks.register('createBundleZip', Zip) {
+    dependsOn 'publishMavenJavaPublicationToBundleDirRepository'
+    
+    archiveFileName = 'bundle.zip'
+    destinationDirectory = layout.buildDirectory.dir('central-bundle')
+    
+    // Captura a partir da raiz do repositório para manter a estrutura io/github/...
+    from(layout.buildDirectory.dir("bundle-staging")) {
+        include "io/github/bortoletoeric/acbrlibcomum/1.0.0-MVP/**"
+    }
+}
